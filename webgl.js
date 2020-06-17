@@ -1,5 +1,6 @@
 const canvasSketch = require('canvas-sketch');
 const random = require('canvas-sketch-util/random');
+const palettes = require('nice-color-palettes');
 
 // Ensure ThreeJS is in global scope for the 'examples/'
 global.THREE = require("three");
@@ -32,12 +33,14 @@ const sketch = ({ context }) => {
   // Setup your scene
   const scene = new THREE.Scene();
 
+  const palette = random.pick(palettes);
+
   const box = new THREE.BoxGeometry(1, 1, 1);
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 40; i++) {
     const mesh = new THREE.Mesh(
       box,
-      new THREE.MeshBasicMaterial({
-        color: "red"
+      new THREE.MeshStandardMaterial({
+        color: random.pick(palette)
       })
     );
     mesh.position.set(
@@ -47,9 +50,20 @@ const sketch = ({ context }) => {
       random.range(-1, 1),
       random.range(-1, 1)
     );
-    mesh.scale.multiplyScalar(0.1);
+    mesh.scale.set(
+      random.range(-1, 1),
+      random.range(-1, 1),
+      random.range(-1, 1)
+    );
+    mesh.scale.multiplyScalar(0.5);
     scene.add(mesh);
   }
+
+  scene.add(new THREE.AmbientLight('hsl(0, 0%, 40%)'));
+
+  const light = new THREE.DirectionalLight('white', 1);
+  light.position.set(0, 0, 4);
+  scene.add(light);
 
   // draw each frame 
   return {
@@ -92,42 +106,3 @@ const sketch = ({ context }) => {
 };
 
 canvasSketch(sketch, settings);
-
-/*
-// Setup a geometry
-const geometry = new THREE.SphereGeometry(1, 32, 16);
-
-// Setup a material
-const material = new THREE.MeshBasicMaterial({
-  color: "red",
-  wireframe: true
-});
-
-// Setup a mesh with geometry + material
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
-
-// draw each frame
-return {
-  // Handle resize events here
-  resize({ pixelRatio, viewportWidth, viewportHeight }) {
-    renderer.setPixelRatio(pixelRatio);
-    renderer.setSize(viewportWidth, viewportHeight, false);
-    camera.aspect = viewportWidth / viewportHeight;
-    camera.updateProjectionMatrix();
-  },
-  // Update & render your scene here
-  render({ time }) {
-    controls.update();
-    renderer.render(scene, camera);
-  },
-  // Dispose of events & renderer for cleaner hot-reloading
-  unload() {
-    controls.dispose();
-    renderer.dispose();
-  }
-};
-};
-
-canvasSketch(sketch, settings);
-*/
